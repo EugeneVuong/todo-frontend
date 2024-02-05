@@ -1,24 +1,36 @@
-import { useState } from "react"
+import { useState } from "react";
 
-const TodoForm = ({ createTodo }) => {
-    const [newTodo, setNewTodo] = useState('')
+const TodoForm = ({ todos, setTodos }) => {
+  const [newTodo, setNewTodo] = useState("");
 
-    const newTodoHandler = (event) => {
-        event.preventDefault()
-        createTodo({ title: newTodo })
-        setNewTodo('')
+  const createTodo = async (newTodo) => {
+    try {
+      const todo = await todoService.createTodo(newTodo);
+      setTodos(todos.concat(todo));
+    } catch (error) {
+      console.log(error);
     }
+  };
 
+  const newTodoHandler = (event) => {
+    event.preventDefault();
+    createTodo({ title: newTodo });
+    setNewTodo("");
+  };
 
-    return (
-        <>
-            <h2>Create Todo</h2>
-            <form onSubmit={(event) => newTodoHandler(event)}>
-                <input placeholder='Todo Title' value={newTodo} onChange={(event) => setNewTodo(event.target.value)} />
-                <button type="submit">Submit</button>
-            </form>
-        </>
-    )
-}
+  return (
+    <>
+      <h2>Create Todo</h2>
+      <form onSubmit={(event) => newTodoHandler(event)}>
+        <input
+          placeholder="Todo Title"
+          value={newTodo}
+          onChange={(event) => setNewTodo(event.target.value)}
+        />
+        <button type="submit">Submit</button>
+      </form>
+    </>
+  );
+};
 
-export default TodoForm
+export default TodoForm;

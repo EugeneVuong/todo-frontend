@@ -1,28 +1,46 @@
 import { useState, useEffect } from "react";
 import todoService from "./services/todos";
-import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
-import TodoFilter from "./components/TodoFilter";
+import { Todo } from "./components/Todo";
 
 const App = () => {
   const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    todoService.getAllTodos().then((todos) => {
-      setTodos(todos);
-    });
+    // db stuff
+    // todoService.getAllTodos().then((todos) => {
+    //   setTodos(todos);
+    // });
   }, []);
 
-  const searchTodo = todos.filter((t) =>
-    t.title.toLowerCase().includes(filter.toLowerCase())
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
     <div>
       <h1>Todos</h1>
       <TodoForm todos={todos} setTodos={setTodos} />
-      <TodoFilter />
-      <TodoList todos={searchTodo} />
+
+      {/* filter */}
+      <h2>Filter Todos</h2>
+      <input
+        value={filter}
+        onChange={(event) => setFilter(event.target.value)}
+      />
+
+      {/* display todos */}
+      <h2>Todo List</h2>
+      <div>
+        {filter.length > 0
+          ? filteredTodos.map((t) => (
+              <Todo key={t.id} todo={t} todos={todos} setTodos={setTodos} />
+            ))
+          : todos.map((t) => (
+              <Todo key={t.id} todo={t} todos={todos} setTodos={setTodos} />
+            ))}
+      </div>
     </div>
   );
 };

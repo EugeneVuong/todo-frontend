@@ -1,60 +1,48 @@
-import { useState, useEffect } from 'react'
-import todoService from './services/todos'
-import TodoList from './components/TodoList'
-import TodoForm from './components/TodoForm'
-import TodoFilter from './components/TodoFilter'
+import { useState, useEffect } from "react";
+import todoService from "./services/todos";
+import TodoForm from "./components/TodoForm";
+import { Todo } from "./components/Todo";
 
 const App = () => {
-
-  const [todos, setTodos] = useState([])
-  const [filter, setFilter] = useState('')
+  const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    todoService.getAllTodos()
-      .then((todos) => {
-        setTodos(todos)
-      })
+    // db stuff
+    // todoService.getAllTodos().then((todos) => {
+    //   setTodos(todos);
+    // });
+  }, []);
 
-  }, [])
-
-  const createTodo = async (newTodo) => {
-    try {
-      const todo = await todoService.createTodo(newTodo)
-      setTodos(todos.concat(todo))
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const deleteTodo = (id) => {
-    todoService.deleteTodo(id)
-      .then(() => {
-        setTodos(todos.filter(t => id !== t.id))
-      })
-  }
-
-  const toggleComplete = (id, todoObj) => {
-    const updatedTodo = {...todoObj, completed: !todoObj.completed}
-    todoService.updateTodo(id, updatedTodo)
-      .then((updatedTodo) => {
-        console.log(updatedTodo)
-        setTodos(todos.map(t => (t.id !== id ? t : updatedTodo)))
-      })
-  }
-
-  
-   
-  const searchTodo = todos.filter(t => t.title.toLowerCase().includes(filter.toLowerCase()))
-  
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <div>
       <h1>Todos</h1>
-      <TodoForm createTodo={createTodo} />
-      <TodoFilter filter={filter} setFilter={setFilter} />
-      <TodoList todos={searchTodo} deleteTodo={deleteTodo} toggleComplete={toggleComplete} />
-    </div>
-  )
-}
+      <TodoForm todos={todos} setTodos={setTodos} />
 
-export default App
+      {/* filter */}
+      <h2>Filter Todos</h2>
+      <input
+        value={filter}
+        onChange={(event) => setFilter(event.target.value)}
+      />
+
+      {/* display todos */}
+      <h2>Todo List</h2>
+      <div>
+        {filter.length > 0
+          ? filteredTodos.map((t) => (
+              <Todo key={t.id} todo={t} todos={todos} setTodos={setTodos} />
+            ))
+          : todos.map((t) => (
+              <Todo key={t.id} todo={t} todos={todos} setTodos={setTodos} />
+            ))}
+      </div>
+    </div>
+  );
+};
+
+export default App;
